@@ -81,6 +81,7 @@ public class BombController : MonoBehaviour
             other.isTrigger = false;
         }
     }
+
     private void ClearDestructibles(Vector2 position){
         Vector3Int cell = destructibleTiles.WorldToCell(position);
         TileBase tile = destructibleTiles.GetTile(cell);
@@ -89,5 +90,10 @@ public class BombController : MonoBehaviour
             Instantiate(destructiblePrefab, position, Quaternion.identity);
             destructibleTiles.SetTile(cell, null);
         }
+    }
+
+    public void Addbomb(){
+        bombAmount++;
+        bombsRemaining++;
     }
 }
