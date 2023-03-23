@@ -20,6 +20,7 @@ public class MovementController : MonoBehaviour
     public AnimatedSpriteRenderer spriteRendererRight;
     public AnimatedSpriteRenderer spriteRendererDeath;
     private AnimatedSpriteRenderer activeSpriteRenderer;
+    
 
     private void Awake(){
         rigidbody = GetComponent<Rigidbody2D>();
@@ -52,7 +53,6 @@ public class MovementController : MonoBehaviour
     private void SetDirection(Vector2 newDirection, AnimatedSpriteRenderer spriteRenderer)
     {
         direction = newDirection;
-
         spriteRendererUp.enabled = spriteRenderer == spriteRendererUp;
         spriteRendererDown.enabled = spriteRenderer == spriteRendererDown;
         spriteRendererLeft.enabled = spriteRenderer == spriteRendererLeft;
@@ -83,5 +83,20 @@ public class MovementController : MonoBehaviour
     private void OnDeathSequenceEnded(){
         gameObject.SetActive(false);
         FindObjectOfType<GameManager>().CheckWinState();
+    }
+
+    public Vector2 GetDirection(){
+        if(activeSpriteRenderer == spriteRendererUp){
+            return Vector2.up;
+        }
+        else if(activeSpriteRenderer == spriteRendererDown){
+            return Vector2.down;
+        }
+        else if(activeSpriteRenderer == spriteRendererLeft){
+            return Vector2.left;
+        }
+        else {
+            return Vector2.right;
+        }
     }
 }

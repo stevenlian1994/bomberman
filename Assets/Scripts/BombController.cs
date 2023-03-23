@@ -2,15 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using TMPro;
 
 public class BombController : MonoBehaviour
 {
     [Header("Bomb")]
     public GameObject bombPrefab;
     public KeyCode inputKey = KeyCode.Space;
+    public KeyCode inputKeyForUltimate = KeyCode.V;
+
     public float bombFuseTime = 3f;
     public int bombAmount = 1;
     private int bombsRemaining;
+    private bool hasUltimate = true;
 
     [Header("Explosion")]
     public Explosion explosionPrefab;
@@ -22,6 +26,9 @@ public class BombController : MonoBehaviour
     public Tilemap destructibleTiles;
     public Destructible destructiblePrefab;
 
+    public AnimatedSpriteRenderer spriteRendererUltimate;
+    public GameObject tmp;
+
     private void OnEnable(){
         bombsRemaining = bombAmount;
     }
@@ -30,10 +37,80 @@ public class BombController : MonoBehaviour
         if (bombsRemaining > 0 && Input.GetKeyDown(inputKey)){
             StartCoroutine(PlaceBomb());
         }
+
+        if (hasUltimate && Input.GetKeyDown(inputKeyForUltimate)){
+            hasUltimate = !hasUltimate;
+            StartCoroutine(CastUltimate());
+        }
+    }
+
+    private IEnumerator CastUltimate(){
+        // tmp.SetActive(true);
+        tmp.SetActive(true);
+        yield return new WaitForSeconds(0.1f);
+        Time.timeScale = 0.0001f;
+        float start = Time.realtimeSinceStartup;
+        while (Time.realtimeSinceStartup - start < 0.5f) // 10 < 13
+        {
+        }
+        Time.timeScale = 1;
+        tmp.SetActive(false);
+        ChainBomb();
+    }
+
+    private void PutBombOneAhead(Vector2 position){
+        position.x = Mathf.Round(position.x);
+        position.y = Mathf.Round(position.y);
+
+        // //check space ahead
+        Vector2 spaceAhead = position + GetComponent<MovementController>().GetDirection();
+
+        if(!Physics2D.OverlapBox(spaceAhead, Vector2.one / 2f, 0f, explosionLayerMask)){
+            StartCoroutine(PlaceBomb(spaceAhead));
+        }
+    }
+
+    private void ChainBomb(){
+        ChainBombHelper(this.transform.position, GetComponent<MovementController>().GetDirection(), 5);
+    }
+
+    private void ChainBombHelper(Vector2 position, Vector2 direction, int length){
+        if(length <= 0) {
+            return;
+        } else {
+            position += direction;
+            length--;
+            PutBombOneAhead(position);
+            ChainBombHelper(position, direction, length);
+        }
     }
 
     private IEnumerator PlaceBomb(){
         Vector2 position = this.transform.position;
+        position.x = Mathf.Round(position.x);
+        position.y = Mathf.Round(position.y);
+
+        GameObject bomb = Instantiate(bombPrefab, position, Quaternion.identity);
+        bombsRemaining--;
+
+        yield return new WaitForSeconds(bombFuseTime);
+        position = bomb.transform.position;
+        position.x = Mathf.Round(position.x);
+        position.y = Mathf.Round(position.y);
+        Explosion explosion = Instantiate(explosionPrefab, position, Quaternion.identity);
+        explosion.SetActiveRenderer(explosion.start);
+        explosion.DestroyAfter(explosionDuration);
+
+        Explode(position, Vector2.up, explosionRadius);
+        Explode(position, Vector2.down, explosionRadius);
+        Explode(position, Vector2.left, explosionRadius);
+        Explode(position, Vector2.right, explosionRadius);
+
+        Destroy(bomb);
+        bombsRemaining++;
+    }
+
+    private IEnumerator PlaceBomb(Vector2 position){
         position.x = Mathf.Round(position.x);
         position.y = Mathf.Round(position.y);
 
@@ -96,4 +173,5 @@ public class BombController : MonoBehaviour
         bombAmount++;
         bombsRemaining++;
     }
+
 }
