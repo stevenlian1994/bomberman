@@ -11,7 +11,7 @@ public class BombController : MonoBehaviour
     public KeyCode inputKey = KeyCode.Space;
     public KeyCode inputKeyForUltimate = KeyCode.V;
 
-    public float bombFuseTime = 3f;
+    public float bombFuseTime = 2.5f;
     public int bombAmount = 1;
     private int bombsRemaining;
     private bool hasUltimate = true;
