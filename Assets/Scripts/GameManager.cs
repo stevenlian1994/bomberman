@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public GameObject[] players;
 
     public void CheckWinState(){
-        int alivecount = 0;
+        int alivecount = 1;
 
         foreach (GameObject player in players) {
             if(player.activeSelf) {
