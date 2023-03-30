@@ -47,6 +47,7 @@ public class BombController : MonoBehaviour
     private IEnumerator CastUltimate(){
         // tmp.SetActive(true);
         tmp.SetActive(true);
+        spriteRendererUltimate.enabled = true;
         yield return new WaitForSeconds(0.1f);
         Time.timeScale = 0.0001f;
         float start = Time.realtimeSinceStartup;
@@ -55,6 +56,7 @@ public class BombController : MonoBehaviour
         }
         Time.timeScale = 1;
         tmp.SetActive(false);
+        spriteRendererUltimate.enabled = false;
         ChainBomb();
     }
 
